@@ -1,0 +1,93 @@
+
+<?php
+$name = $data['title_string'];
+header('Content-type: application/vnd.ms-excel; charset=utf-8');
+header('Content-Disposition: attachment; filename=test.xlsx');
+header("Pragma: no-cache");
+header("Expires: 0");
+
+?>
+
+
+/Funciones Posiciones
+function posicion($data, $periodo, $entidad, $valores, $region, $nivel){
+        if ($nivel == "3" || $nivel == "4") {
+            $entidad = $region;
+        }
+        $posicion = 0;
+        $val_entidad = 0; 
+        //dd($data);
+        foreach ($data as $consulta) {//dd($entidad);
+            if($consulta['cve_ent'] == $entidad){
+                $val_entidad = $consulta[$periodo];//dd($consulta);
+            }
+        }
+        $cnt = 0;
+        foreach ($data as $consulta) {
+            if($consulta['cve_ent'] != '0'){
+                if ($valores[$cnt][$periodo] != 0) {
+                    if ($val_entidad < $consulta[$periodo]) {
+                        if ($consulta[$periodo]!=0) {
+                                $posicion ++;
+                            }
+                    }elseif ($val_entidad == $consulta[$periodo]) {
+                        $posicion ++;
+                    }
+                }
+                
+            }
+            $cnt++;
+        }
+
+        return($posicion);
+        
+    }
+
+    function posicion_2($data, $periodo, $entidad, $base_entidad, $base_nacional, $valores, $region, $nivel){
+        if ($nivel == "3" || $nivel == "4") {
+            $entidad = $region;
+        }
+        $posicion = 0;//dd($data);
+        $val_entidad = 0;
+        //dd($periodo);   
+        //if($periodo == 'Promedio'){$periodo='Promedio';} 
+        foreach ($data as $consulta) {
+            if($consulta['cve_ent'] == $entidad){
+                $val_entidad = $consulta[$periodo];
+            }
+        }$cnt = 0;
+        foreach ($data as $consulta) {
+            if($consulta['cve_ent'] != '0'){
+                if ($valores[$cnt][$periodo] != 0) {
+                    if ($base_entidad[$periodo]>=0 && $base_nacional[$periodo]<0) {
+                        //if ($val_entidad > $consulta[$periodo]) {
+                        if ($val_entidad > $consulta[$periodo]) {
+                            if ($consulta[$periodo]!=0) {
+                                $posicion ++;
+                            }  
+                        }elseif ($val_entidad == $consulta[$periodo]) {
+                            $posicion ++;
+                        }
+                    }elseif ($base_entidad[$periodo]<0 && $base_nacional[$periodo]<0) {
+                        if ($val_entidad > $consulta[$periodo]) {
+                            if ($consulta[$periodo]!=0) {
+                                $posicion ++;
+                            }   
+                        }elseif ($val_entidad == $consulta[$periodo]) {
+                            $posicion ++;
+                        }
+                    }else{
+                        if ($val_entidad < $consulta[$periodo]) {
+                            if ($consulta[$periodo]!=0) {
+                                $posicion ++;
+                            } 
+                        }elseif ($val_entidad == $consulta[$periodo]) {
+                            $posicion ++;
+                        }
+                    }
+                } 
+            }
+            $cnt++;
+        }
+        return($posicion);  
+    }
